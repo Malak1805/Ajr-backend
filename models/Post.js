@@ -16,13 +16,15 @@ goal_amount:{
 },
 current_amount:{
   type: Number,
-  required: true
+  default: 0
 },
-created_at:{
-  type: Date,
+userId:{
+  type: mongoose.Schema.Types.ObjectId,
+  ref: 'User',
   required: true
 }
-}
+},
+{timestamps: true}
 
 
 )

@@ -3,20 +3,22 @@ const { type } = require('os')
 
 const commentSchema = new mongoose.Schema(
   {
-    comment: {
+    message: {
       type: String,
       required: true
     },
     userId:{
-     type: String,
+     type: mongoose.Schema.Types.ObjectId,
+     ref: 'User',
      required: true
     },
     postId:{
-      type: Number,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Post',
       required: true
     },
-    timestamps: true
-  }
+    
+  },{timestamps: true}
 )
 
 module.exports = mongoose.model('Comment', commentSchema)
