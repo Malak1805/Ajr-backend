@@ -5,10 +5,10 @@ const middlewares = require('../middlewares')
 router.post('/login', UserCtrl.login)
 router.post('/register', UserCtrl.register)
 router.put(
-  '',
+  '/password',
   middlewares.stripToken,
   middlewares.verifyToken,
-  UserCtrl.UpdatePassword
+  UserCtrl.updatePassword
 )
 
 router.put(
@@ -18,25 +18,14 @@ router.put(
   UserCtrl.updateProfile
 )
 router.get(
-  '/profile/:id',
-  middlewares.stripToken,
-  middlewares.verifyToken,
-  UserCtrl.getResById
-)
-router.get(
   '/profile',
   middlewares.stripToken,
   middlewares.verifyToken,
   UserCtrl.getProfileById
 )
-router.put(
-  '/profile',
-  middlewares.stripToken,
-  middlewares.verifyToken,
-  UserCtrl.updateProfile
-)
+
 router.delete(
-  '',
+  '/profile',
   middlewares.stripToken,
   middlewares.verifyToken,
   UserCtrl.deleteProfile

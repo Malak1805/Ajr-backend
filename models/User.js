@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true
     },
-    password: {
+    password_digest: {
       type: String,
       required: true     
     },

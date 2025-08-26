@@ -1,6 +1,6 @@
 //imports
 const express = require('express')
-require('dotenv').config
+require('dotenv').config()
 const cors = require('cors')
 const path = require('path')
 
@@ -37,9 +37,9 @@ const UserRt = require('./routes/userRouter')
 
 
 //use routers
-app.use('/comment', commentRouter)
-app.use('/donation', donationRouter)
-app.use('/post', postRouter)
+app.use('/comments', commentRouter)
+app.use('/donations', donationRouter)
+app.use('/posts', postRouter)
 app.use('/auth', UserRt)
 
 
