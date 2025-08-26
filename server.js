@@ -30,11 +30,17 @@ app.get('/', (req, res) => {
 
 // test - zainab
 //require routers
-
+const commentRouter = require('./routes/commentRouter')
+const donationRouter = require('./routes/donationRouter')
+const postRouter = require('./routes/postRouter')
+const UserRt = require('./routes/userRouter')
 
 
 //use routers
-
+app.use('/comment', commentRouter)
+app.use('/donation', donationRouter)
+app.use('/post', postRouter)
+app.use('/auth', UserRt)
 
 
 //use listener

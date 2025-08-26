@@ -3,7 +3,7 @@ const Comment = require('../models/Comment')
 exports.addComment = async (req, res) => {
   try {
     const comment = new Comment({
-      content: req.body.content,
+      content: req.body.message,
       post: req.params.postId,
       user: req.session.user._id
     })

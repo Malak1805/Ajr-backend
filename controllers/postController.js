@@ -3,17 +3,15 @@ const Donation = require('../models/Donation')
 
 // Show all posts
 exports.getAllPosts = async (req, res) => {
-  const posts = await Post.find().populate('user')
+  const posts = await Post.find().populate('userId')
   res.render('posts/index', { posts })
 }
 
 // Show single post + donations
 exports.getPostById = async (req, res) => {
-  const post = await Post.findById(req.params.id)
-    .populate('user')
-    .populate('comments.user')
+  const post = await Post.findById(req.params.id).populate('userId')
 
-  const donations = await Donation.find({ post: post._id })
+  const donations = await Donation.find({ post: post._id }).populate('user')
 
   const totalDonations = donations.reduce((sum, d) => sum + d.amount, 0)
 
@@ -25,8 +23,9 @@ exports.createPost = async (req, res) => {
   try {
     const post = new Post({
       title: req.body.title,
-      content: req.body.content,
-      user: req.session.user._id
+      description: req.body.description,
+      goal_amount: req.body.goal_amount,
+      userId: req.session.user._id
     })
     await post.save()
     res.redirect('/posts')
@@ -38,7 +37,7 @@ exports.createPost = async (req, res) => {
 // Edit post
 exports.editPost = async (req, res) => {
   const post = await Post.findById(req.params.id)
-  if (!post || post.user.toString() !== req.session.user._id.toString()) {
+  if (!post || post.userId.toString() !== req.session.user._id.toString()) {
     return res.redirect('/posts')
   }
   res.render('posts/edit', { post })
@@ -48,7 +47,8 @@ exports.editPost = async (req, res) => {
 exports.updatePost = async (req, res) => {
   await Post.findByIdAndUpdate(req.params.id, {
     title: req.body.title,
-    content: req.body.content
+    description: req.body.description,
+    goal_amount: req.body.goal_amount
   })
   res.redirect(`/posts/${req.params.id}`)
 }
@@ -56,7 +56,7 @@ exports.updatePost = async (req, res) => {
 // Delete post
 exports.deletePost = async (req, res) => {
   const post = await Post.findById(req.params.id)
-  if (post.user.toString() !== req.session.user._id.toString()) {
+  if (post.userId.toString() !== req.session.user._id.toString()) {
     return res.redirect('/posts')
   }
   await Post.findByIdAndDelete(req.params.id)
