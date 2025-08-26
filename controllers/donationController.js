@@ -28,6 +28,15 @@ exports.makeDonation = async (req, res) => {
     post.current_amount = (post.current_amount || 0) + amount;
     await post.save();
 
+    res.status(201).send({
+      status: 'Success',
+      msg: 'Donation made successfully',
+      donation,
+      postAmounts: { // Added postAmounts to the response
+        current_amount: post.current_amount,
+        goal_amount: post.goal_amount}
+    }); 
+
     // Respond with the newly created donation
     res.status(201).send({ status: 'Success', msg: 'Donation made successfully', donation }); 
   } catch (error) {

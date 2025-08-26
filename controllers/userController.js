@@ -55,6 +55,9 @@ exports.login = async (req, res) => {
       });
     }
 
+     console.log('DEBUG: User found in DB:', userInDB);
+        console.log('DEBUG: Password from request (req.body.password):', password);
+        console.log('DEBUG: Password digest from DB (userInDB.password_digest):', userInDB.password_digest);
   
     const matched = await middleWares.comparePassword(
       password,

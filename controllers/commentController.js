@@ -16,7 +16,7 @@ exports.addComment = async (req, res) => {
     // Create a new comment
     const comment = new Comment({
       message, 
-      post: postId,
+      postId: postId,
       userId 
     });
     await comment.save();
@@ -29,6 +29,8 @@ exports.addComment = async (req, res) => {
   }
 };
 
+
+
 // Delete a comment
 exports.deleteComment = async (req, res) => {
   try {
@@ -36,20 +38,17 @@ exports.deleteComment = async (req, res) => {
     const { id: userId } = res.locals.payload;
     const commentId = req.params.id;
 
-    
-    const comment = await Comment.findById(commentId);
 
+    const comment = await Comment.findById(commentId);
     
     if (!comment) {
       return res.status(404).send({ status: 'Error', msg: 'Comment not found' });
     }
 
-    
     if (comment.userId.toString() !== userId.toString()) {
       return res.status(403).send({ status: 'Error', msg: 'Unauthorized to delete this comment' });
     }
 
-    
     const deletedComment = await Comment.findByIdAndDelete(commentId);
 
     res.status(200).send({ status: 'Success', msg: 'Comment deleted successfully', deletedComment });
@@ -59,3 +58,14 @@ exports.deleteComment = async (req, res) => {
   }
 };
 
+//Get All Comments on One Post
+
+exports.getAllComments = async (req, res) => {
+  try {
+    const comment = await Comment.find().populate('commentId', 'first_name last_name'); 
+    res.status(200).send(comment);
+  } catch (error) {
+    console.error("Error fetching all comments:", error);
+    res.status(500).send({ status: 'Error', msg: 'Failed to retrieve comments' });
+  }
+};
