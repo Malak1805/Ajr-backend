@@ -19,4 +19,9 @@ router.delete(
   CommentCtrl.deleteComment
 )
 
+router.get(
+  '/:postId',
+  CommentCtrl.getCommentsByPostId
+)
+
 module.exports = router

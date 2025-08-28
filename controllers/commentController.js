@@ -69,3 +69,21 @@ exports.getAllComments = async (req, res) => {
     res.status(500).send({ status: 'Error', msg: 'Failed to retrieve comments' })
   }
 }
+
+// Get Comment By Post Id
+exports.getCommentsByPostId = async (req, res) => {
+  try {
+    const postId = req.params.postId; // Get postId from URL parameters
+
+    // Find comments for the specific postId and populate the 'userId' field
+    // with 'first_name' and 'last_name' from the User model.
+    const comments = await Comment.find({ postId: postId })
+      .populate('userId', 'first_name last_name') // Correctly populate userId
+      .sort({ createdAt: -1 }); // Optional: sort by newest first
+
+    res.status(200).send({ status: 'Success', comments });
+  } catch (error) {
+    console.error("Error fetching comments for post:", error);
+    res.status(500).send({ status: 'Error', msg: 'Failed to retrieve comments for post' });
+  }
+};
