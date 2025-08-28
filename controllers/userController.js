@@ -62,22 +62,22 @@ exports.login = async (req, res) => {
     const matched = await middleWares.comparePassword(
       password,
       userInDB.password_digest
-    );
+    )
 
     if (matched) {
-      userInDB.failedLoginAttempts = 0;
-      userInDB.lockUntil = undefined;
-      await userInDB.save();
+      userInDB.failedLoginAttempts = 0
+      userInDB.lockUntil = undefined
+      await userInDB.save()
 
-      // Create a payload for the JWT
+
       let payload = {
         id: userInDB._id,
         email: userInDB.email,
         name: userInDB.first_name 
       };
 
-      let token = middleWares.createToken(payload);
-      return res.status(200).send({ user: payload, token });
+      let token = middleWares.createToken(payload)
+      return res.status(200).send({ user: payload, token })
     }
 
   
@@ -99,25 +99,25 @@ exports.login = async (req, res) => {
   }
 };
 
-// Logout a user (for JWT-based authentication, this is typically client-side)
+// Logout a user for JWT authentication
 exports.logout = (req, res) => {
  
-  res.status(200).send({ status: 'Success', msg: 'Logged out successfully (client should discard token).' });
-};
+  res.status(200).send({ status: 'Success', msg: 'Logged out successfully (client should discard token).' })
+}
 
 
 exports.getProfileById = async (req, res) => {
   try {
-    const { id } = res.locals.payload;
-    const profile = await User.findById(id);
+    const { id } = res.locals.payload
+    const profile = await User.findById(id)
 
     if (!profile) {
-      return res.status(404).send({ msg: 'User not found' });
+      return res.status(404).send({ msg: 'User not found' })
     }
-    res.status(200).send(profile);
+    res.status(200).send(profile)
   } catch (error) {
-    console.error("Get profile error:", error);
-    res.status(500).send({ status: 'Error', msg: 'Failed to retrieve profile' });
+    console.error("Get profile error:", error)
+    res.status(500).send({ status: 'Error', msg: 'Failed to retrieve profile' })
   }
 };
 
@@ -126,10 +126,9 @@ exports.updateProfile = async (req, res) => {
   try {
     
     const { id } = res.locals.payload;
-    // Find and update the user, returning the new document
     const updatedProfile = await User.findByIdAndUpdate(id, req.body, {
-      new: true, // Return the updated document
-      runValidators: true // Run schema validators on update
+      new: true, 
+      runValidators: true 
     });
 
     if (!updatedProfile) {
@@ -185,7 +184,6 @@ exports.updatePassword = async (req, res) => {
     );
 
     if (matched) {
-      // If old password matches, hash the new password and update the user
       const password_digest = await middleWares.hashPassword(
         req.body.new_password
       );
@@ -195,7 +193,7 @@ exports.updatePassword = async (req, res) => {
         { new: true } // Return the updated document
       );
 
-      // Create a payload for a new JWT (optional, but good practice after password change)
+      // Create a payload for a new JWT 
       const payload = {
         id: userInDB._id,
         email: userInDB.email,
