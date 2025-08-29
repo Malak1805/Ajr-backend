@@ -79,7 +79,7 @@ exports.getCommentsByPostId = async (req, res) => {
     // with 'first_name' and 'last_name' from the User model.
     const comments = await Comment.find({ postId: postId })
       .populate('userId', 'first_name last_name') // Correctly populate userId
-      .sort({ createdAt: -1 }); // Optional: sort by newest first
+      .sort({ createdAt: -1 }); 
 
     res.status(200).send({ status: 'Success', comments });
   } catch (error) {

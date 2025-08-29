@@ -34,7 +34,7 @@ router.get(
   '/session',
   middlewares.stripToken,
   middlewares.verifyToken,
-  middlewares.CheckSession
+  UserCtrl.getProfileById
 )
 
 module.exports = router

@@ -4,7 +4,7 @@ const middleWares = require('../middlewares')
 // Register a new user
 exports.register = async (req, res) => {
   try {
-    const { first_name, last_name, email, password, address } = req.body;
+    const { first_name, last_name, email, password, address, phone_number } = req.body;
 
     
     let userInDB = await User.findOne({ email });
@@ -22,6 +22,7 @@ exports.register = async (req, res) => {
       email,
       password_digest,
       address,
+      phone_number,
       failedLoginAttempts: 0, 
       lockUntil: undefined 
     });
