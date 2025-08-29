@@ -1,11 +1,27 @@
 const Post = require('../models/Post')
 const Donation = require('../models/Donation')
 const mongoose = require('mongoose')
-// Get all posts
+
+// Get all posts //added search
 exports.getAllPosts = async (req, res) => {
   try {
-    const posts = await Post.find()
-    res.status(200).send(posts)
+    const { search } = req.query
+    let query = {}
+
+    if (search) {
+      query = {
+        $or: [
+          { title: { $regex: search, $options: 'i' } },
+          { description: { $regex: search, $options: 'i' } }
+        ]
+      }
+    }
+
+    const posts = await Post.find(query).populate(
+      'userId',
+      'first_name last_name'
+    )
+    res.status(200).send({ posts })
   } catch (error) {
     console.error('Error fetching all posts:', error)
     res.status(500).send({ status: 'Error', msg: 'Failed to retrieve posts' })
@@ -14,30 +30,39 @@ exports.getAllPosts = async (req, res) => {
 
 // Get a single post by Id with its donations
 exports.getPostById = async (req, res) => {
-try {
-    const postId = req.params.id;
+  try {
+    const postId = req.params.id
 
     // Validate if the ID is a valid MongoDB ObjectId
     if (!mongoose.Types.ObjectId.isValid(postId)) {
-      console.error('Error fetching post by ID: Invalid ID format', postId);
-      return res.status(400).send({ status: 'Error', msg: 'Invalid post ID format' });
+      console.error('Error fetching post by ID: Invalid ID format', postId)
+      return res
+        .status(400)
+        .send({ status: 'Error', msg: 'Invalid post ID format' })
     }
 
-    const post = await Post.findById(postId).populate('userId', 'first_name last_name email');
+    const post = await Post.findById(postId).populate(
+      'userId',
+      'first_name last_name email'
+    )
     if (!post) {
-      return res.status(404).send({ status: 'Error', msg: 'Post not found' });
+      return res.status(404).send({ status: 'Error', msg: 'Post not found' })
     }
 
-    const donations = await Donation.find({ post: post._id }).populate('user', 'first_name last_name email');
-    const totalDonations = donations.reduce((sum, d) => sum + d.amount, 0);
+    const donations = await Donation.find({ post: post._id }).populate(
+      'user',
+      'first_name last_name email'
+    )
+    const totalDonations = donations.reduce((sum, d) => sum + d.amount, 0)
 
-    res.status(200).send({ post, donations, totalDonations });
+    res.status(200).send({ post, donations, totalDonations })
   } catch (error) {
-    console.error("Error fetching post by ID:", error);
-    res.status(500).send({ status: 'Error', msg: 'Failed to retrieve post details' });
+    console.error('Error fetching post by ID:', error)
+    res
+      .status(500)
+      .send({ status: 'Error', msg: 'Failed to retrieve post details' })
   }
-};
-
+}
 
 // Create a new post
 exports.createPost = async (req, res) => {
@@ -53,7 +78,7 @@ exports.createPost = async (req, res) => {
       userId: id
     })
     await post.save()
-    await post.populate('userId', 'first_name last_name email');
+    await post.populate('userId', 'first_name last_name email')
 
     res.status(201).send(post)
   } catch (error) {
@@ -117,13 +142,11 @@ exports.updatePost = async (req, res) => {
       { new: true, runValidators: true }
     )
 
-    res
-      .status(200)
-      .send({
-        status: 'Success',
-        msg: 'Post updated successfully',
-        updatedPost
-      })
+    res.status(200).send({
+      status: 'Success',
+      msg: 'Post updated successfully',
+      updatedPost
+    })
   } catch (error) {
     console.error('Error updating post:', error)
     res.status(500).send({ status: 'Error', msg: 'Failed to update post' })
@@ -150,13 +173,11 @@ exports.deletePost = async (req, res) => {
 
     const deletedPost = await Post.findByIdAndDelete(postId)
 
-    res
-      .status(200)
-      .send({
-        status: 'Success',
-        msg: 'Post deleted successfully',
-        deletedPost
-      })
+    res.status(200).send({
+      status: 'Success',
+      msg: 'Post deleted successfully',
+      deletedPost
+    })
   } catch (error) {
     console.error('Error deleting post:', error)
     res.status(500).send({ status: 'Error', msg: 'Failed to delete post' })
