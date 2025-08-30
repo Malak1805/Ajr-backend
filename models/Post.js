@@ -22,7 +22,22 @@ userId:{
   type: mongoose.Schema.Types.ObjectId,
   ref: 'User',
   required: true
-}
+
+}, 
+category: {
+    type: String,
+    enum: [
+      'Medical & Health',
+      'Education',
+      'Disaster Relief',
+      'Community & Social Causes',
+      'Children & Orphans',
+      'Animal Welfare',
+      'Environmental Causes',
+      'Religious & Charity'
+    ],
+   
+  }
 },
 {timestamps: true}
 

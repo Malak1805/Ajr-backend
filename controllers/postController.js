@@ -5,16 +5,19 @@ const mongoose = require('mongoose')
 // Get all posts //added search
 exports.getAllPosts = async (req, res) => {
   try {
-    const { search } = req.query
+    const { search, category } = req.query
     let query = {}
 
     if (search) {
-      query = {
-        $or: [
-          { title: { $regex: search, $options: 'i' } },
-          { description: { $regex: search, $options: 'i' } }
-        ]
-      }
+      query.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+         { category: { $regex: search, $options: 'i' } }
+      ]
+    }
+
+    if (category) {
+      query.category = category
     }
 
     const posts = await Post.find(query).populate(
@@ -69,12 +72,13 @@ exports.createPost = async (req, res) => {
   try {
     const { id } = res.locals.payload
 
-    const { title, description, goal_amount } = req.body
+    const { title, description, goal_amount, category } = req.body
     console.log(id)
     const post = new Post({
       title,
       description,
       goal_amount,
+      category,
       userId: id
     })
     await post.save()
@@ -98,7 +102,7 @@ exports.editPost = async (req, res) => {
       return res.status(404).send({ status: 'Error', msg: 'Post not found' })
     }
 
-    // Optional: Ensure only the owner can fetch data for editing
+
     if (post.userId.toString() !== userId.toString()) {
       return res
         .status(403)
@@ -137,7 +141,8 @@ exports.updatePost = async (req, res) => {
       {
         title: req.body.title,
         description: req.body.description,
-        goal_amount: req.body.goal_amount
+        goal_amount: req.body.goal_amount,
+        category: req.body.category
       },
       { new: true, runValidators: true }
     )
