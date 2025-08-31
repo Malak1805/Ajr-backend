@@ -73,13 +73,17 @@ exports.createPost = async (req, res) => {
     const { id } = res.locals.payload
 
     const { title, description, goal_amount, category } = req.body
+
+    const image = req.file ? `/uploads/${req.file.filename}` : null
+
     console.log(id)
     const post = new Post({
       title,
       description,
       goal_amount,
       category,
-      userId: id
+      userId: id,
+      image: req.file ? `/uploads/${req.file.filename}` : null,
     })
     await post.save()
     await post.populate('userId', 'first_name last_name email')
@@ -136,14 +140,21 @@ exports.updatePost = async (req, res) => {
         .send({ status: 'Error', msg: 'Unauthorized to update this post' })
     }
 
+     const updatedData = {
+      title: req.body.title,
+      description: req.body.description,
+      goal_amount: req.body.goal_amount,
+      category: req.body.category,
+    }
+
+   
+    if (req.file) {
+      updatedData.image = `/uploads/${req.file.filename}`
+    }
+
     const updatedPost = await Post.findByIdAndUpdate(
       postId,
-      {
-        title: req.body.title,
-        description: req.body.description,
-        goal_amount: req.body.goal_amount,
-        category: req.body.category
-      },
+      updatedData,
       { new: true, runValidators: true }
     )
 

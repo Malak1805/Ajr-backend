@@ -20,6 +20,7 @@ const morgan = require('morgan')
 app.use(express.urlencoded({ extended: true }))
 app.use(morgan('dev'))
 app.use(express.static(path.join(__dirname, 'public')))
+app.use("/uploads", express.static(path.join(__dirname, "uploads")))
 app.use(cors())
 app.use(express.json())
 
@@ -41,6 +42,7 @@ app.use('/comments', commentRouter)
 app.use('/donations', donationRouter)
 app.use('/posts', postRouter)
 app.use('/auth', UserRt)
+
 
 
 //use listener

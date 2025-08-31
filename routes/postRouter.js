@@ -2,6 +2,7 @@
 const router = require('express').Router()
 const PostCtrl = require('../controllers/postController')
 const middlewares = require('../middlewares')
+const upload = require('../middlewares/upload')
 
 // Get all posts
 router.get('/', PostCtrl.getAllPosts)
@@ -14,6 +15,7 @@ router.post(
   '/',
   middlewares.stripToken,
   middlewares.verifyToken,
+  upload.single('image'),
   PostCtrl.createPost
 )
 
@@ -30,6 +32,7 @@ router.put(
   '/:id',
   middlewares.stripToken,
   middlewares.verifyToken,
+  upload.single('image'),
   PostCtrl.updatePost
 )
 

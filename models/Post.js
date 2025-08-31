@@ -37,7 +37,11 @@ category: {
       'Religious & Charity'
     ],
    
-  }
+  },
+  image: {   
+      type: String, 
+      default: null
+    }
 },
 {timestamps: true}
 
