@@ -17,11 +17,7 @@ exports.makeDonation = async (req, res) => {
       return res.status(404).json({ status: 'Error', msg: 'Post not found' })
     }
 
-    // Get user info
-    const user = await User.findById(userId);
-    if (!user || !user.address || !user.country) {
-      return res.status(400).json({ status: 'Error', msg: 'User address and country required' })
-    }
+
 
 
     // Save donation
@@ -30,7 +26,6 @@ exports.makeDonation = async (req, res) => {
       message,
       user: userId,
       post: postId,
-      location,
       payment_status: 'completed'
     })
 

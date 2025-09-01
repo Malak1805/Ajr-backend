@@ -4,7 +4,7 @@ const middleWares = require('../middlewares')
 // Register a new user
 exports.register = async (req, res) => {
   try {
-    const { first_name, last_name, email, password, address, phone_number, country } = req.body
+    const { first_name, last_name, email, password, address, phone_number } = req.body
 //return these fields to the user to fill
     
 
