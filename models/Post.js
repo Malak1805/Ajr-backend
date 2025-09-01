@@ -36,6 +36,7 @@ category: {
       'Environmental Causes',
       'Religious & Charity'
     ],
+    required: true
    
   },
   image: {   

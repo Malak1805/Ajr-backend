@@ -5,7 +5,7 @@ const mongoose = require('mongoose')
 // Get all posts //added search
 exports.getAllPosts = async (req, res) => {
   try {
-    const { search, category } = req.query
+    const { search, category } = req.query //implementing search
     let query = {}
 
     if (search) {

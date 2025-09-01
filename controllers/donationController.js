@@ -1,104 +1,95 @@
 const Donation = require('../models/Donation')
 const Post = require('../models/Post')
+const User = require('../models/User')
 
-// Make a donation to a post
+
+// Make a donation
 exports.makeDonation = async (req, res) => {
   try {
     const { id: userId } = res.locals.payload
     const postId = req.params.postId
     const { amount, message } = req.body
+    
 
-    // Validate if the post exists
-    const post = await Post.findById(postId)
+    // Validate post
+    const post = await Post.findById(postId);
     if (!post) {
-      return res
-        .status(404)
-        .send({ status: 'Error', msg: 'Post not found for donation' })
+      return res.status(404).json({ status: 'Error', msg: 'Post not found' })
     }
 
-    // Create a new donation
-    const donation = new Donation({
+    // Get user info
+    const user = await User.findById(userId);
+    if (!user || !user.address || !user.country) {
+      return res.status(400).json({ status: 'Error', msg: 'User address and country required' })
+    }
+
+
+    // Save donation
+    const donation = await Donation.create({
       amount,
       message,
       user: userId,
       post: postId,
+      location,
       payment_status: 'completed'
     })
-    await donation.save()
 
-    // Update the current_amount of the post
+    // Update post current amount
     post.current_amount = (post.current_amount || 0) + amount
-    await post.save()
+    await post.save();
 
-    res.status(201).send({
+
+
+    res.status(201).json({
       status: 'Success',
       msg: 'Donation made successfully',
       donation,
       postAmounts: {
-        // Added postAmounts to the response
         current_amount: post.current_amount,
         goal_amount: post.goal_amount
       }
-    })
+    });
   } catch (error) {
-    console.error('Error making donation:', error)
-    res.status(500).send({ status: 'Error', msg: 'Failed to make donation' })
+    console.error('Error making donation:', error);
+    res.status(500).json({ status: 'Error', msg: 'Failed to make donation' })
   }
 }
 
-// Get All Donations of a Specific Post
+// Get donations for a specific post
 exports.getDonationsByPost = async (req, res) => {
   try {
-    const postId = req.params.postId // Find all donations that belong to the specified post
+    const postId = req.params.postId;
+    const donations = await Donation.find({ post: postId })
+      .populate('user', 'first_name last_name')
 
-    const donations = await Donation.find({ post: postId }).populate(
-      'user',
-      'first_name last_name'
-    ) // Populate to show the donor's name
-
-    if (!donations) {
-      return res
-        .status(404)
-        .send({ status: 'Error', msg: 'No donations found for this post' })
+    if (!donations || donations.length === 0) {
+      return res.status(404).json({ status: 'Error', msg: 'No donations found for this post' });
     }
 
-    res.status(200).send({
-      status: 'Success',
-      msg: 'Donations retrieved successfully',
-      donations: donations
-    })
+    res.status(200).json({ status: 'Success', donations });
   } catch (error) {
-    console.error('Error fetching donations:', error)
-    res
-      .status(500)
-      .send({ status: 'Error', msg: 'Failed to retrieve donations' })
+    console.error('Error fetching donations:', error);
+    res.status(500).json({ status: 'Error', msg: 'Failed to retrieve donations' });
+  }
+}
+
+// Get all donations by a user
+exports.getDonationsByUser = async (req, res) => {
+  try {
+    const { id: userId } = res.locals.payload;
+    const donations = await Donation.find({ user: userId }).populate('post');
+
+    res.status(200).json({
+      status: 'Success',
+      donations
+    });
+  } catch (error) {
+    console.error('Error fetching user donations:', error);
+    res.status(500).json({ status: 'Error', msg: 'Failed to retrieve donations' });
   }
 }
 
 
-exports.getDonationsByUser = async (req, res) => {
-    try {
-        const { id: userId } = res.locals.payload; // Get user ID from the token
 
-        const userDonations = await Donation.find({ user: userId }).populate('post');
-        
-        // Extract unique posts from the user's donations
-        const donatedPosts = [];
-        const postIds = new Set();
-        userDonations.forEach(donation => {
-            if (donation.post && !postIds.has(donation.post._id.toString())) {
-                donatedPosts.push(donation.post);
-                postIds.add(donation.post._id.toString());
-            }
-        });
 
-        res.status(200).json({
-            status: 'Success',
-            msg: 'Donated posts retrieved successfully',
-            donatedPosts
-        });
-    } catch (error) {
-        console.error("Error fetching user's donations:", error);
-        res.status(500).json({ status: 'Error', msg: 'Failed to retrieve donated posts' });
-    }
-};
+

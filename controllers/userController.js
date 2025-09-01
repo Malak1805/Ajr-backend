@@ -4,12 +4,13 @@ const middleWares = require('../middlewares')
 // Register a new user
 exports.register = async (req, res) => {
   try {
-    const { first_name, last_name, email, password, address, phone_number } = req.body;
-
+    const { first_name, last_name, email, password, address, phone_number, country } = req.body
+//return these fields to the user to fill
     
-    let userInDB = await User.findOne({ email });
+
+    let userInDB = await User.findOne({ email }); //if user enters a used email
     if (userInDB) {
-      return res.status(400).send({ status: 'Error', msg: 'User with this email already exists' });
+      return res.status(400).send({ status: 'Error', msg: 'User with this email already exists' })
     }
 
     // Hash the password 
@@ -25,13 +26,13 @@ exports.register = async (req, res) => {
       phone_number,
       failedLoginAttempts: 0, 
       lockUntil: undefined 
-    });
+    })
 
     
     res.status(200).send(newUser);
   } catch (error) {
   
-    console.error("Registration error:", error);
+    console.error("Registration error:", error) //error message 
   
     res.status(500).send({ status: 'Error', msg: 'Registration failed' });
   }
@@ -53,13 +54,9 @@ exports.login = async (req, res) => {
       return res.status(423).send({
         status: 'Error',
         msg: 'Account temporarily locked due to too many failed attempts. Try again later.'
-      });
+      })
     }
 
-     console.log('DEBUG: User found in DB:', userInDB);
-        console.log('DEBUG: Password from request (req.body.password):', password);
-        console.log('DEBUG: Password digest from DB (userInDB.password_digest):', userInDB.password_digest);
-  
     const matched = await middleWares.comparePassword(
       password,
       userInDB.password_digest
@@ -106,7 +103,7 @@ exports.logout = (req, res) => {
   res.status(200).send({ status: 'Success', msg: 'Logged out successfully (client should discard token).' })
 }
 
-
+// get user profile by Id
 exports.getProfileById = async (req, res) => {
   try {
     const { id } = res.locals.payload
@@ -167,7 +164,7 @@ exports.updatePassword = async (req, res) => {
     const { id } = res.locals.payload;
     let userInDB = await User.findById(id);
 
-    if (!userInDB) {
+    if (!userInDB) { //if the user not in the database
       return res.status(404).send({ status: 'error', msg: 'User not found' });
     }
 
@@ -210,5 +207,5 @@ exports.updatePassword = async (req, res) => {
   } catch (error) {
     console.error("Update password error:", error);
     res.status(500).send({ status: 'Error', msg: 'Failed to update password' });
-  }
+  };
 };

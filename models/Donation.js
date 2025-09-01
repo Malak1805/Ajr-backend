@@ -3,11 +3,7 @@ const mongoose = require('mongoose')
 
 const donationSchema = new mongoose.Schema(
 {
-payment_status:{
-  type: String,
-  enum: ['pending', 'completed', 'cancelled'],
-  default: 'pending'
-},
+
 amount:{
   type: Number,
   required: true
@@ -24,7 +20,9 @@ post:{
   type: mongoose.Schema.Types.ObjectId,
   ref: 'Post',
   required: true
-},
+}
+
+  
 },{timestamps: true}
 
 )
