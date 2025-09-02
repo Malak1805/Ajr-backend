@@ -5,16 +5,8 @@ const mongoose = require('mongoose')
 // Get all posts //added search
 exports.getAllPosts = async (req, res) => {
   try {
-    const { search, category } = req.query //implementing search
+const { category } = req.query //category filter
     let query = {}
-
-    if (search) {
-      query.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } },
-         { category: { $regex: search, $options: 'i' } }
-      ]
-    }
 
     if (category) {
       query.category = category
@@ -22,8 +14,9 @@ exports.getAllPosts = async (req, res) => {
 
     const posts = await Post.find(query).populate(
       'userId',
-      'first_name last_name'
+      'first_name last_name' // populate user info
     )
+
     res.status(200).send({ posts })
   } catch (error) {
     console.error('Error fetching all posts:', error)
@@ -31,10 +24,11 @@ exports.getAllPosts = async (req, res) => {
   }
 }
 
+
 // Get a single post by Id with its donations
 exports.getPostById = async (req, res) => {
   try {
-    const postId = req.params.id
+    const postId = req.params.id 
 
     // Validate if the ID is a valid MongoDB ObjectId
     if (!mongoose.Types.ObjectId.isValid(postId)) {
@@ -74,7 +68,7 @@ exports.createPost = async (req, res) => {
 
     const { title, description, goal_amount, category } = req.body
 
-    const image = req.file ? `/uploads/${req.file.filename}` : null
+    const image = req.file ? `/uploads/${req.file.filename}` : null // Save it path
 
     console.log(id)
     const post = new Post({

@@ -25,9 +25,8 @@ exports.makeDonation = async (req, res) => {
       amount,
       message,
       user: userId,
-      post: postId,
-      payment_status: 'completed'
-    })
+      post: postId
+    });
 
     // Update post current amount
     post.current_amount = (post.current_amount || 0) + amount

@@ -75,7 +75,7 @@ exports.getCommentsByPostId = async (req, res) => {
   try {
     const postId = req.params.postId; // Get postId from URL parameters
 
-    // Find comments for the specific postId and populate the 'userId' field
+    // Finds comments for the specific postId and populate the 'userId' field
     // with 'first_name' and 'last_name' from the User model.
     const comments = await Comment.find({ postId: postId })
       .populate('userId', 'first_name last_name') // Correctly populate userId

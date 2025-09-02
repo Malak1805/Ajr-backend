@@ -44,8 +44,8 @@ exports.login = async (req, res) => {
     const { email, password } = req.body;
 
     // Find the user by email
-    const userInDB = await User.findOne({ email });
-    if (!userInDB) {
+    const userInDB = await User.findOne({ email }); //find user by email
+    if (!userInDB) { //if not
       return res.status(401).send({ status: 'Error', msg: 'Unauthorized: Invalid credentials' });
     }
 
@@ -57,17 +57,17 @@ exports.login = async (req, res) => {
       })
     }
 
-    const matched = await middleWares.comparePassword(
+    const matched = await middleWares.comparePassword( //storing the hashed pass
       password,
       userInDB.password_digest
     )
-
+// reset and save
     if (matched) {
       userInDB.failedLoginAttempts = 0
       userInDB.lockUntil = undefined
       await userInDB.save()
 
-
+//payload
       let payload = {
         id: userInDB._id,
         email: userInDB.email,
@@ -84,7 +84,7 @@ exports.login = async (req, res) => {
   
     const MAX_FAILED_ATTEMPTS = 5;
     const LOCK_DURATION_MS = 10 * 60 * 1000; 
-    if (userInDB.failedLoginAttempts >= MAX_FAILED_ATTEMPTS) {
+    if (userInDB.failedLoginAttempts >= MAX_FAILED_ATTEMPTS) { //set lock for 10 min if failure to 5
       userInDB.lockUntil = Date.now() + LOCK_DURATION_MS;
     }
     await userInDB.save();
